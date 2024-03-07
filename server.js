@@ -6,13 +6,17 @@ app.use(cors());
 app.use(express.json())
 
 const dbConnection = require('./config/dbConnection');
-const { gets, addUser, getAllUsers } = require('./controller/userController');
+// const { gets, addUser, getAllUsers } = require('./controller/userController');
+const { gets, addUser, getAllUsers } = require('./controller/user2Controller');
+const { sendMail } = require('./controller/emailController');
 
 dbConnection();
 
 app.get('/', gets);
 app.post('/user', addUser);
 app.get('/users', getAllUsers);
+
+app.post('/send-mail', sendMail);
 // app.post('/patient', addData);
 
 app.listen(port, () => {

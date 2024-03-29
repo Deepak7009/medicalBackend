@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { Login } = require("../models/loginSchema");
+const mongoose = require('mongoose');
 
 const nodemailer = require("nodemailer");
 
@@ -155,18 +156,42 @@ const getUserDetails = async (req, res) => {
   }
 };
 
+
 const updateUsername = async (req, res) => {
   try {
-    const { username } = req.body;
-    const userId = req.user._id;
+    const { username, userId } = req.body;
+    const _id = req.body.userId;
+    // const { user } = req;
+    
+    console.log('username, userId', username, userId); // Debugging: Log the request body
+    // console.log('User Object:', user); // Debugging: Log the user object
 
-    await Login.updateOne({ _id: userId }, { username });
+    // if (!user) {
+    //   console.log('User not found');
+    //   return res.status(404).json({ error: 'User not found' });
+    // }
 
-    res.status(200).json({ message: "Username updated successfully" });
+    // Find the user by username to check if it exists
+    const updatedUser = await Login.findByIdAndUpdate(_id, { username }, { new: true });
+    console.log("updatedUser=>", updatedUser)
+    if (!updatedUser) {
+      console.log('User with username not found');
+      return res.status(404).json({ error: 'User with username not found' });
+    }
+
+    // Update the username
+    // user.username = username;
+    // await user.save();
+
+    console.log('Username updated successfully');
+    res.status(200).json({ message: 'Username updated successfully', updatedUser });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+    console.error('Error updating username:', error);
+    res.status(500).json({ error: 'Error updating username', details: error.message });
   }
 };
+
+
+
 
 module.exports = { register, login, forgetPassword, getUserDetails, updateUsername };
